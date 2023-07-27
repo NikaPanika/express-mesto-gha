@@ -66,7 +66,7 @@ const updateProfile = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
-      return res.send({ data: { name, about } });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
