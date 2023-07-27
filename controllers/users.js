@@ -61,12 +61,12 @@ const updateProfile = (req, res) => {
       .send({ message: 'Невалидные данные' });
     return;
   }
-  User.findByIdAndUpdate(userId, { name, about })
+  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Нет пользователя с таким id' });
       }
-      return res.send(user);
+      return res.send({ data: { name, about } });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

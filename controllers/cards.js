@@ -49,7 +49,7 @@ const deleteCardById = (req, res) => {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.message === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Введен некорректный id' });
         return;
       }
@@ -71,7 +71,7 @@ const likeCard = (req, res) => {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.message === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Введен некорректный id' });
         return;
       }
@@ -93,7 +93,7 @@ const dislikeCard = (req, res) => {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.message === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Введен некорректный id' });
         return;
       }
