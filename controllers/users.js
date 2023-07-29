@@ -39,7 +39,6 @@ const returnUsers = (req, res) => {
 const returnUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(() => Error('Not found'))
     .then((user) => {
       if (!user) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
@@ -59,7 +58,6 @@ const updateProfile = (req, res) => {
   const { name, about } = req.body;
   const { userId } = req.params;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .orFail(() => Error('Not found'))
     .then((user) => {
       if (!user) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет пользователя с таким id' });
@@ -79,7 +77,6 @@ const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const { userId } = req.params;
   User.findByIdAndUpdate(userId, { avatar })
-    .orFail(() => Error('Not found'))
     .then((user) => {
       if (!user) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет пользователя с таким id' });

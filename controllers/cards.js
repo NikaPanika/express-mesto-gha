@@ -44,7 +44,6 @@ const returnCards = (req, res) => {
 const deleteCardById = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .orFail(() => Error('Not found'))
     .then((card) => {
       if (!card) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
@@ -67,7 +66,6 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(() => Error('Not found'))
     .then((card) => {
       if (!card) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
@@ -90,7 +88,6 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail(() => Error('Not found'))
     .then((card) => {
       if (!card) {
         return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
