@@ -66,9 +66,9 @@ const login = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  const userId = req.user._id;
+  const { id } = req.user;
 
-  User.findById(userId)
+  User.findById(id)
     .then((user) => {
       res.send(user);
     })
@@ -82,8 +82,8 @@ const returnUsers = (req, res, next) => {
 };
 
 const returnUserById = (req, res, next) => {
-  const { userId } = req.params;
-  User.findById(userId)
+  const { id } = req.params;
+  User.findById(id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -95,8 +95,8 @@ const returnUserById = (req, res, next) => {
 
 const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
-  const { userId } = req.params;
-  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
+  const { id } = req.user;
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
@@ -108,8 +108,8 @@ const updateProfile = (req, res, next) => {
 
 const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const { userId } = req.params;
-  User.findByIdAndUpdate(userId, { avatar })
+  const { id } = req.user;
+  User.findByIdAndUpdate(id, { avatar })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
