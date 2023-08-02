@@ -11,7 +11,7 @@ const {
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const owner = req.user.id;
   Card.create({ name, link, owner })
     .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
     .catch(next);
@@ -25,13 +25,13 @@ const returnCards = (req, res, next) => {
 
 const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  const { userId } = req.user.id;
+  const { id } = req.user.id;
 
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
-      } else if (card.owner.toString() === userId) {
+      } else if (card.owner.toString() === id) {
         Card.findByIdAndRemove(cardId)
           .then((data) => {
             res.send({ data, message: 'Удалено' });
@@ -48,7 +48,7 @@ const likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { $addToSet: { likes: req.user.id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
     .orFail(new Error('NotValidId'))
@@ -67,7 +67,7 @@ const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user.id } }, // убрать _id из массива
     { new: true },
   )
     .orFail(new Error('NotValidId'))

@@ -102,7 +102,7 @@ const updateProfile = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      res.status(HTTP_STATUS_OK).send(user);
+      res.status(HTTP_STATUS_OK).send({ data: { name, about } });
     })
     .catch(next);
 };
@@ -115,7 +115,7 @@ const updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.send(user);
+      return res.send({ data: { avatar } });
     })
     .catch(next);
 };
