@@ -10,6 +10,7 @@ const NotFoundError = require('../erorrs/notFound');
 const JWT_SECRET = 'strange-secret-key';
 
 const {
+  HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
 } = http2.constants;
 
@@ -67,10 +68,9 @@ const login = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   const { id } = req.user;
-
   User.findById(id)
     .then((user) => {
-      res.send(user);
+      res.status(HTTP_STATUS_OK).send(user);
     })
     .catch(next);
 };
@@ -83,12 +83,13 @@ const returnUsers = (req, res, next) => {
 
 const returnUserById = (req, res, next) => {
   const { id } = req.params;
+  console.log(http2.constants);
   User.findById(id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.send(user);
+      return res.status(HTTP_STATUS_OK).send(user);
     })
     .catch(next);
 };
