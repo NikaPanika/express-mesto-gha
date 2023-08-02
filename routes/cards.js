@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-
-const regularExpression = /^(https?:\/\/)(www\.)?[-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]+#?$/;
+const { regularExpression } = require('../utils/regularExpression');
 
 const {
   createCard, returnCards, deleteCardById, likeCard, dislikeCard,

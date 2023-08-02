@@ -30,11 +30,12 @@ const createUser = (req, res, next) => {
           }))
         .catch((err) => {
           if (err.code === 11000) {
-            throw new DuplicationError('Пользователь с таким Email уже существует');
+            next(new DuplicationError('Пользователь с таким Email уже существует'));
+          } else {
+            next(err);
           }
-        })
-        .catch(next);
-    });
+        });
+    }).catch(next);
 };
 
 const login = (req, res, next) => {
@@ -61,7 +62,8 @@ const login = (req, res, next) => {
             sameSite: true,
           })
             .send({ id: user._id });
-        });
+        })
+        .catch(next);
     })
     .catch(next);
 };

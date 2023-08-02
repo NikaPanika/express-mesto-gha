@@ -31,7 +31,7 @@ const deleteCardById = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Нет карточки с таким id');
       } else if (card.owner.toString() === id) {
-        Card.findByIdAndRemove(cardId)
+        Card.deleteOne(card)
           .then((data) => {
             res.send({ data, message: 'Удалено' });
           })
@@ -56,10 +56,11 @@ const likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError('Нет карточки с таким id');
+        next(new NotFoundError('Нет карточки с таким id'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const dislikeCard = (req, res, next) => {
@@ -75,10 +76,11 @@ const dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'NotValidId') {
-        throw new NotFoundError('Нет карточки с таким id');
+        next(new NotFoundError('Нет карточки с таким id'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

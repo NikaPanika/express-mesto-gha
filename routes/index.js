@@ -5,8 +5,7 @@ const usersRouter = require('./users');
 const cardsRouter = require('./cards');
 const { createUser, login } = require('../controllers/users');
 const NotFoundError = require('../erorrs/notFound');
-
-const regularExpression = /^(https?:\/\/)(www\.)?[-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]+#?$/;
+const { regularExpression } = require('../utils/regularExpression');
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
