@@ -68,7 +68,6 @@ const login = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   const { id } = req.user;
-  console.log(id);
   User.findById(id)
     .then((user) => {
       res.status(HTTP_STATUS_OK).send(user);
