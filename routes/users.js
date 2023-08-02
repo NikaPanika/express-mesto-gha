@@ -9,13 +9,13 @@ const {
 
 router.get('/', returnUsers);
 
+router.get('/me', getUser);
+
 router.get('/:id', celebrate({
   params: Joi.object().keys({
     id: Joi.string().length(24).hex().required(),
   }),
 }), returnUserById);
-
-router.get('/me', getUser);
 
 router.patch('/me', celebrate({
   body: Joi.object().keys({
