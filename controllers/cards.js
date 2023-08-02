@@ -1,65 +1,49 @@
-const mongoose = require('mongoose');
 const http2 = require('http2');
 const Card = require('../models/card');
 
+const NotFoundError = require('../erorrs/notFound');
+const ForbiddenError = require('../erorrs/forbiddenError');
+
 const {
   HTTP_STATUS_CREATED,
-  HTTP_STATUS_BAD_REQUEST,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR,
 } = http2.constants;
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
-    .catch((error) => {
-      // тут проверяем не является ли ошибка
-      // ошибкой валидации
-      if (error instanceof mongoose.Error.ValidationError) {
-        res
-          .status(HTTP_STATUS_BAD_REQUEST)
-          .send({ message: 'Невалидные данные' });
-        return;
-      }
-
-      // в остальных случаях выкидываем 500 ошибку
-      res
-        .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
-const returnCards = (req, res) => {
+const returnCards = (req, res, next) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
-    .catch(() => {
-      res
-        .status(HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  const { userId } = req.user.id;
+
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
+        throw new NotFoundError('Нет карточки с таким id');
+      } else if (card.owner.toString() === userId) {
+        Card.findByIdAndRemove(cardId)
+          .then((data) => {
+            res.send({ data, message: 'Удалено' });
+          })
+          .catch(next);
+      } else {
+        throw new ForbiddenError('Вы не можете удалить карточку');
       }
-      return res.send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Введен некорректный id' });
-        return;
-      }
-      res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -68,20 +52,14 @@ const likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
+        throw new NotFoundError('Нет карточки с таким id');
       }
       return res.send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Введен некорректный id' });
-        return;
-      }
-      res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -90,17 +68,11 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(HTTP_STATUS_NOT_FOUND).send({ message: 'Нет карточки с таким id' });
+        throw new NotFoundError('Нет карточки с таким id');
       }
       return res.send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(HTTP_STATUS_BAD_REQUEST).send({ message: 'Введен некорректный id' });
-        return;
-      }
-      res.status(HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
-    });
+    .catch(next);
 };
 
 module.exports = {
