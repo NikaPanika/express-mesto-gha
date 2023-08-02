@@ -51,7 +51,7 @@ const login = (req, res, next) => {
             throw new AuthError('Неправильные почта или пароль');
           }
           const token = jwt.sign(
-            { _id: user._id },
+            { id: user._id },
             JWT_SECRET,
             { expiresIn: '7d' },
           );
@@ -68,6 +68,7 @@ const login = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   const { id } = req.user;
+  console.log(id);
   User.findById(id)
     .then((user) => {
       res.status(HTTP_STATUS_OK).send(user);
@@ -88,7 +89,7 @@ const returnUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.status(HTTP_STATUS_OK).send(user);
+      res.status(HTTP_STATUS_OK).send(user);
     })
     .catch(next);
 };
@@ -96,12 +97,13 @@ const returnUserById = (req, res, next) => {
 const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   const { id } = req.user;
-  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
+
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true, upsert: false })
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.send({ data: { name, about } });
+      res.status(HTTP_STATUS_OK).send(user);
     })
     .catch(next);
 };
@@ -114,7 +116,7 @@ const updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Нет пользователя с таким id');
       }
-      return res.send({ data: { avatar } });
+      return res.send(user);
     })
     .catch(next);
 };

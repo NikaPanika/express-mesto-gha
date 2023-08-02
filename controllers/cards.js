@@ -5,6 +5,7 @@ const NotFoundError = require('../erorrs/notFound');
 const ForbiddenError = require('../erorrs/forbiddenError');
 
 const {
+  HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
 } = http2.constants;
 
@@ -50,11 +51,14 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
+    .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (!card) {
+      res.status(HTTP_STATUS_OK).send({ data: card });
+    })
+    .catch((err) => {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError('Нет карточки с таким id');
       }
-      return res.send({ data: card });
     })
     .catch(next);
 };
@@ -66,11 +70,14 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(new Error('NotValidId'))
     .then((card) => {
-      if (!card) {
+      res.status(HTTP_STATUS_OK).send({ data: card });
+    })
+    .catch((err) => {
+      if (err.message === 'NotValidId') {
         throw new NotFoundError('Нет карточки с таким id');
       }
-      return res.send({ data: card });
     })
     .catch(next);
 };
