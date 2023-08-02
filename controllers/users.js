@@ -83,7 +83,6 @@ const returnUsers = (req, res, next) => {
 
 const returnUserById = (req, res, next) => {
   const { id } = req.params;
-  console.log(http2.constants);
   User.findById(id)
     .then((user) => {
       if (!user) {
